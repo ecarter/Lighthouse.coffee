@@ -1,37 +1,63 @@
-# Get current stories from Lighthouse
+# Get current Projects and Tickets from LighthouseApp.com
 #
-# You need to set the following variables:
-#   HUBOT_LIGHTHOUSE_TOKEN = <API token>
+# Add to heroku :
+# % heroku config:add HUBOT_LIGHTHOUSE_PROJECT ="..."
+# % heroku config:add HUBOT_LIGHTHOUSE_TOKEN="..."
+# Example error and further API :
+# http://help.lighthouseapp.com/kb/api/
 #
-# If you're working on a single project, you can set it once:
-#   HUBOT_LIGHTHOUSE_PROJECT = <project name>
-#
-# Otherwise, include the project name in your message to Hubot.
-#
-# > show me all lighthouse projects
-# > show me tickets for <project_id>
-
 module.exports = (robot) ->
-  robot.respond /show\s+(me\s+)?(all\s+)?( lighthouse|lh)\s+(projects\s+)?(.*)/i, (msg) ->
+
+  # Get all project
+  # Hubot> hubot show me all projects  
+  robot.respond /(show me all )(lighthouse|lh)( projects)$/i, (msg) ->
     token = process.env.HUBOT_LIGHTHOUSE_TOKEN
     project = process.env.HUBOT_LIGHTHOUSE_PROJECT
-    
+  
     msg.http("http://#{project}.lighthouseapp.com/projects.json")
       .headers("X-LighthouseToken": "#{token}")
       .get() (err, res, body) ->
         body = JSON.parse(body)
         body.projects.forEach (p) ->
-          msg.send "Lighthouse Project Information ##{p.project.id}: #{p.project.name} Open tickets: #{p.project.open_tickets_count} Permalink: http://#{project}.lighthouseapp.com/projects"
+          msg.send "1.[##{p.project.id}] [#{p.project.name}] Tickets Open - #{p.project.open_tickets_count} - http://#{project}.lighthouseapp.com/projects/#{p.project.id}-#{p.project.permalink}"
 
-  robot.respond /show\s+(me\s+)?tickets\s+(for\s+)?(.*)/i, (msg) ->
-    query = msg.match[3]
+  # Get information on a single projects
+  # Hubot> hubot show me (lighthouse|lh) project <project_id>
+  robot.respond /(show me )(lighthouse|lh)?( project)(.*)$/i, (msg) ->
+    project_id = msg.match[4]
     token = process.env.HUBOT_LIGHTHOUSE_TOKEN
     project = process.env.HUBOT_LIGHTHOUSE_PROJECT
- 
-    msg.http("http://#{project}.lighthouseapp.com/projects/#{query}/tickets.json")
+    
+    msg.http("http://#{project}.lighthouseapp.com/projects/#{project_id}.json")
+      .headers("X-LighthouseToken": "#{token}")
+      .get() (err, res, body) ->
+        body = JSON.parse(body)
+        msg.send "2.[##{body.project.id}] [#{body.project.name}] Tickets Open - #{body.project.open_tickets_count} - http://#{project}.lighthouseapp.com/projects/#{body.project.id}-#{body.project.permalink}"
+
+  # Get all tickets for a Given project
+  # Hubot> show me (lighthouse|lh) tickets for <project_id>
+  robot.respond /(show me )(lighthouse|lh)( tickets for)(.*)$/i, (msg) ->
+    project_id = msg.match[4]
+    token = process.env.HUBOT_LIGHTHOUSE_TOKEN
+    project = process.env.HUBOT_LIGHTHOUSE_PROJECT
+   
+    msg.http("http://#{project}.lighthouseapp.com/projects/#{project_id}/tickets.json")
       .headers("X-LighthouseToken": "#{token}")
       .get() (err, res, body) ->
         body = JSON.parse(body)
         body.tickets.forEach (t) ->
-          msg.send "Project ##{t.ticket.project_id} Id ##{t.ticket.number} [#{t.ticket.state.toUpperCase()}] TITLE - #{t.ticket.title} ASSIGNED - #{t.ticket.assigned_user_id} [#{t.ticket.closed == 'false' ? 'Closed' : 'Open'}]  Milestone - #{t.ticket.milestone_id == 'null' ? 'Empty' : t.ticket.milestone_id}"
-          
+          msg.send "3.[##{t.ticket.project_id}] [Userid##{t.ticket.assigned_user_id}] [Ticket##{t.ticket.number}] #{t.ticket.state.toUpperCase()} '#{t.ticket.title}' - #{t.ticket.url}"
+
+  # Get information on a single ticket
+  # Hubot> show me (lighthouse|lh) <ticket_id> in <project_id>
+  robot.respond /(show me )(lighthouse|lh )?(ticket )(.*)( in)(.*)$/i, (msg) ->
+    ticket_id = msg.match[4]
+    project_id = msg.match[6]
+    token = process.env.HUBOT_LIGHTHOUSE_TOKEN
+    project = process.env.HUBOT_LIGHTHOUSE_PROJECT
+    
+    msg.http("http://#{project}.lighthouseapp.com/projects/#{project_id}}/tickets/#{ticket_id}.json")
+      .headers("X-LighthouseToken": "#{token}")
+      .get() (err, res, body) ->
+        body = JSON.parse(body)
+        msg.send "4.[##{body.ticket.project_id}] [UserId##{body.ticket.user_id}] [Number#{body.ticket.number}] #{body.ticket.state.toUpperCase()}  '#{body.ticket.title}' - #{body.ticket.url}"
