@@ -1,7 +1,7 @@
 # Talk to LighthouseApp.com from Hubot
 #
 # Add to heroku:
-# Bash$ heroku config:add HUBOT_LIGHTHOUSE_PROJECT ="..."
+# Bash$ heroku config:add HUBOT_LIGHTHOUSE_ACCOUNT ="..."
 # Bash$ heroku config:add HUBOT_LIGHTHOUSE_TOKEN="..."
 #
 # Explore API further:
@@ -10,8 +10,10 @@
 # Created_by Dustin Eichler 12/19/2011
  
 findAllProjects = (project) ->
-  project.http("http://#{@lighthouse.project_name}.lighthouseapp.com/projects.json")
-    .headers("X-LighthouseToken": "#{@lighthouse.token}")
+  project.http("http://#{@lighthouse.account}.lighthouseapp.com/projects.json")
+    .headers
+      "Content-Type": "application/json",
+      "X-LighthouseToken": "#{@lighthouse.token}"
     .get() (err, res, body) ->
       if err
         project.send "Error #{err}"
@@ -24,23 +26,25 @@ findAllProjects = (project) ->
             "Project-Id #{p.project.id}\n",
             "Project-Name #{p.project.name}\n",
             "Open Tickets #{p.project.open_tickets_count}\n",
-            "http://#{@lighthouse.project_name}.lighthouseapp.com/projects/#{p.project.id}-#{p.project.permalink}\n"
-          ]
-          project.send message.join(",")
+            "http://#{@lighthouse.account}.lighthouseapp.com/projects/#{p.project.id}-#{p.project.permalink}\n"
+            ]
+          project.send message.join("")
       else
-        project.send "Error #{res.message}"
+        project.send "Error #{body}"
 
 findProjectById = (project) ->
   project_id = project.match[4]
-  
+
   if project_id
     project_id.trim()
   else
     proeject.send "Error"
     return
 
-  project.http("http://#{@lighthouse.project_name}.lighthouseapp.com/projects/#{project_id}.json")
-    .headers("X-LighthouseToken": "#{@lighthouse.token}")
+  project.http("http://#{@lighthouse.account}.lighthouseapp.com/projects/#{project_id}.json")
+    .headers
+      "Content-Type": "application/json",
+      "X-LighthouseToken": "#{@lighthouse.token}"
     .get() (err, res, body) ->
       if err
         project.send "Error #{err}"
@@ -51,18 +55,21 @@ findProjectById = (project) ->
         message = [
           "Project-Id #{body.project.id}\n",
           "Project-Name #{body.project.name}\n",
-          "Open Tickets #{body.projects.open_tickets_count}\n",
-          "http://#{@lighthouse.project_name}.lighthouseapp.com/projects/#{body.project.id}-#{body.project.permalink}\n"
-        ]
-        project.send message.join(",")
+          "Open Tickets #{body.project.open_tickets_count}\n",
+          "http://#{@lighthouse.account}.lighthouseapp.com/projects/#{body.project.id}-#{body.project.permalink}\n"
+          ]
+        project.send message.join("")
       else
-        project.send "Error #{res}"
+        project.send "Error #{body}"
 
 
 findAllTickets = (ticket) ->
   ticket_id = ticket.match[4]
-  ticket.http("http://#{@lighthouse.project_name}.lighthouseapp.com/projects/#{ticket_id}/tickets.json")
-    .headers("X-LighthouseToken": "#{@lighthouse.token}")
+  
+  ticket.http("http://#{@lighthouse.account}.lighthouseapp.com/projects/#{ticket_id}/tickets.json")
+    .headers
+      "Content-Type": "application/json",
+      "X-LighthouseToken": "#{@lighthouse.token}"
     .get() (err, res, body) ->
       if err
         ticket.send "Error"
@@ -77,17 +84,19 @@ findAllTickets = (ticket) ->
             "Assigned #{t.ticket.assigned_user_id}\n",
             "Ticket-Number #{t.ticket.number}\n",
             "#{t.ticket.url}\n"
-          ]
-          ticket.send message.join(",")
+            ]
+          ticket.send message.join("")
       else
-        ticket.send "Error #{res.message}"
+        ticket.send "Error #{body}"
         
 findTicketByIds = (ticket) ->
   ticket_id  = ticket.match[6]
   project_id = ticket.match[4]
   
-  ticket.http("http://#{@lighthouse.project_name}.lighthouseapp.com/projects/#{project_id}}/tickets/#{ticket_id}.json")
-    .headers("X-LighthouseToken": "#{@lighthouse.token}")
+  ticket.http("http://#{@lighthouse.account}.lighthouseapp.com/projects/#{project_id}}/tickets/#{ticket_id}.json")
+    .headers
+      "Content-Type": "application/json",
+      "X-LighthouseToken": "#{@lighthouse.token}"
     .get() (err, res, body) ->
       if err
         ticket.send "Error"
@@ -101,18 +110,17 @@ findTicketByIds = (ticket) ->
           "Assigned #{body.ticket.user_id}\n",
           "Ticket-Number #{body.ticket.number}\n",
           "#{body.ticket.url}"
-        ]
-        ticket.send message.join(",")
+          ]
+        ticket.send message.join("")
       else
-        ticket.send "Error #{res.message}"
+        ticket.send "Error #{body}"
 
 class Lighthouse
   constructor: (rawDescription) ->
     @token = process.env.HUBOT_LIGHTHOUSE_TOKEN
-    @project_name = process.env.HUBOT_LIGHTHOUSE_PROJECT
+    @account = process.env.HUBOT_LIGHTHOUSE_ACCOUNT
 
 module.exports = (robot) ->
-
   @lighthouse = new Lighthouse
    
   # Find all projects
