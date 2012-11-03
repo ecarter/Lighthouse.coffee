@@ -134,20 +134,20 @@ module.exports = (robot) ->
    
   # Find all projects
   # Hubot> hubot show me all projects  
-  robot.respond /(show me all )(lighthouse|lh)( projects)$/i, (msg) ->
+  robot.respond /(show me all )?(lighthouse|lh)( projects)$/i, (msg) ->
     findAllProjects msg
 
   # Find information on a single project
   # Hubot> hubot show me (lighthouse|lh) project <project_id>
-  robot.respond /(show me )(lighthouse|lh)?( project)(.*)$/i, (msg) ->
+  robot.respond /(show me )?(lighthouse|lh)?( project)(.*)$/i, (msg) ->
     findProjectById msg
 
   # Find all tickets for a Given project
   # Hubot> show me (lighthouse|lh) tickets for <project_id>
-  robot.respond /(show me )(lighthouse|lh)( tickets for)(.*)$/i, (msg) ->
+  robot.respond /(show me )?(lighthouse|lh)( tickets for)(.*)$/i, (msg) ->
     findAllTickets msg
    
   # Find information on a single ticket
   # Hubot> show me (lighthouse|lh) ticket <ticket_id> in <project_id>
-  robot.respond /(show me )(lighthouse|lh )?(ticket )(.*)( in)(.*)$/i, (msg) ->
+  robot.respond /(show me )?(lighthouse|lh )?(ticket )(.*)( in)(.*)$/i, (msg) ->
     findTicketByIds msg
