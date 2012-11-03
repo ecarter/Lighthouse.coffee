@@ -1,14 +1,23 @@
-# Talk to LighthouseApp.com from Hubot
+# Description:
+#   Talk to LighthouseApp.com from Hubot
 #
-# Add to heroku:
-# Bash$ heroku config:add HUBOT_LIGHTHOUSE_ACCOUNT ="..."
-# Bash$ heroku config:add HUBOT_LIGHTHOUSE_TOKEN="..."
+# Configuration:
+#   HUBOT_LIGHTHOUSE_ACCOUNT ="..."
+#   HUBOT_LIGHTHOUSE_TOKEN="..."
 #
-# Explore API further:
-# http://help.lighthouseapp.com/kb/api/
+# Commands:
 #
-# Created_by Dustin Eichler 12/19/2011
- 
+#   hubot (lighthouse|lh) projects - Find all lighthouse current projects
+#   hubot (lighthouse|lh) project <project_id> - Find a lighthouse project by Id
+#   hubot (lighthouse|lh) tickets for <project_id> - Find all current lighthouse tickets for a project
+#   hubot (lighthouse|lh) ticket <ticket_id> in <project_id> - Find a lighthouse ticket by Id
+#
+# Notes:
+#   Explore API further: http://help.lighthouseapp.com/kb/api/
+#
+# Author:
+#   Dustin Eichler <http://github.com/dustineichler>
+
 findAllProjects = (project) ->
   project.http("http://#{@lighthouse.account}.lighthouseapp.com/projects.json")
     .headers
