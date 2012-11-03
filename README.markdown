@@ -1,35 +1,31 @@
-### Lighthouse.coffee
-====================
+# Lighthouse.coffee
 
-### Installation (Rails 3)
+Talk to LighthouseApp.com from Hubot
 
-<pre>
-  Bash$ heroku config:add HUBOT_LIGHTHOUSE_PROJECT ="..."
-  Bash$ heroku config:add HUBOT_LIGHTHOUSE_TOKEN="..."
-</pre>
+## Configuration
 
-### Classes
+    HUBOT_LIGHTHOUSE_ACCOUNT="..." # lighthouse subdomain
+    HUBOT_LIGHTHOUSE_TOKEN="..." # lighthouse api token
 
-*[Lighthouse.coffee](https://github.com/dustineichler/Lighthouse.coffee/blob/master/lighthouse.coffee) Lighthouse Hubot main file
+## Commands
 
-### Usage
+__Find all lighthouse current projects:__
 
-***Find all lighthouse current projects***
-<pre>
-  Hubot> hubot show me all projects 
-</pre>
+    hubot (lighthouse|lh) projects 
 
-***Find a lighthouse project by Id***
-<pre>
-  Hubot> hubot show me (lighthouse|lh) project <project_id>
-</pre>
+__Find a lighthouse project by Id:__
 
-***Find all current lighthouse tickets for a project***
-<pre>
-  Hubot> show me (lighthouse|lh) tickets for <project_id>
-</pre>
+    hubot (lighthouse|lh) project <project_id>
 
-***Find a lighthouse ticket by Id***
-<pre>
-  Hubot> show me (lighthouse|lh) ticket <ticket_id> in <project_id>
-</pre>
+__Find all current lighthouse tickets for a project:__
+
+    hubot (lighthouse|lh) tickets for <project_id>
+
+__Find a lighthouse ticket by Id:__
+
+    hubot (lighthouse|lh) ticket <ticket_id> in <project_id>
+
+## Author
+
+[Dustin Eichler](http://github.com/dustineichler)
+
